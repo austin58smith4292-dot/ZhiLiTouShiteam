@@ -1,134 +1,256 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>治理透镜 · 跨境数字治理评估平台</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Source+Code+Pro:wght@400;600&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>治理透镜 · 跨境治理生态平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="brand-icon">
-          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="20" cy="20" r="18" stroke="#f0c040" stroke-width="1.5" opacity="0.6"/>
-            <circle cx="20" cy="20" r="12" stroke="#f0c040" stroke-width="1.5" opacity="0.8"/>
-            <circle cx="20" cy="20" r="6" fill="#f0c040" opacity="0.9"/>
-            <line x1="20" y1="2" x2="20" y2="38" stroke="#f0c040" stroke-width="0.8" opacity="0.5"/>
-            <line x1="2" y1="20" x2="38" y2="20" stroke="#f0c040" stroke-width="0.8" opacity="0.5"/>
-            <ellipse cx="20" cy="20" rx="18" ry="9" stroke="#f0c040" stroke-width="0.8" opacity="0.4"/>
-          </svg>
-        </div>
-        <div class="brand-text">
-          <h1>治理透镜</h1>
-          <p>跨境电商政府数字治理风险评估平台</p>
-        </div>
-      </div>
-      <div class="header-meta">
-        <div class="meta-badge"><span class="meta-dot"></span><span>GAIR · EGDI</span></div>
-        <div class="meta-badge">北京理工大学</div>
-      </div>
-    </div>
-    <div class="header-grid"></div>
-  </header>
+  <div class="mesh-bg"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
 
-  <main class="site-main">
-    <div class="control-bar">
-      <nav class="tab-nav" role="tablist">
-        <button class="tab-btn active" data-tab="world" role="tab">
-          <span class="tab-icon">🌐</span>
-          <span class="tab-label">全球国家视角</span>
-          <span class="tab-sub">186个国家 · 跨境电商治理风险</span>
-        </button>
-        <button class="tab-btn" data-tab="china" role="tab">
-          <span class="tab-icon">🗺️</span>
-          <span class="tab-label">中国省域视角</span>
-          <span class="tab-sub">中国34个省级行政区 · 本站收录31个省级地区</span>
-        </button>
-      </nav>
-      <div class="search-wrap">
-        <div class="search-box">
-          <span class="search-icon">⌕</span>
-          <input type="text" id="search-input" placeholder="搜索国家或省份名称…" autocomplete="off" />
-          <button class="search-btn" onclick="handleSearch()">查询</button>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="26" stroke="currentColor" stroke-width="1.6" opacity="0.45"/>
+              <circle cx="32" cy="32" r="16" stroke="currentColor" stroke-width="1.6" opacity="0.7"/>
+              <circle cx="32" cy="32" r="7" fill="currentColor" opacity="0.95"/>
+              <path d="M10 42C18 35 24 33 32 33C40 33 46 35 54 42" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
+              <path d="M16 20C22 26 26 28 32 28C38 28 42 26 48 20" stroke="currentColor" stroke-width="1.4" opacity="0.6"/>
+              <path d="M32 8V56" stroke="currentColor" stroke-width="1.2" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>治理透镜</h1>
+            <p>跨境电商数字治理生态平台</p>
+          </div>
         </div>
-        <div id="search-tip" class="search-tip"></div>
-      </div>
-    </div>
 
-    <div class="content-stage">
-      <div class="stage-split">
-        <div class="maps-col">
-          <section id="world-section" class="panel-section active" role="tabpanel">
-            <div class="map-frame">
-              <div class="map-frame-label">全球数字治理风险分布地图</div>
-              <div id="world-map-svg" class="map-canvas"></div>
-              <div class="map-legend">
-                <div class="legend-title">综合评分区间</div>
-                <div class="legend-items">
-                  <div class="legend-item"><span class="legend-dot" style="background:#27ae60"></span><span>低风险 ≥85</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span><span>中等 70–84</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#f39c12"></span><span>较高 55–69</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span><span>高风险 &lt;55</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#2d3f5e"></span><span>暂无数据</span></div>
-                </div>
-              </div>
+        <nav class="main-nav">
+          <div class="nav-track">
+            <button class="nav-btn active" data-section="home">首页</button>
+            <button class="nav-btn" data-section="map">地图计算</button>
+            <button class="nav-btn" data-section="policy">政策了解</button>
+            <button class="nav-btn" data-section="discussion">企业讨论</button>
+          </div>
+        </nav>
+
+        <div class="header-right">
+          <span class="live-badge"><span class="live-dot"></span>数据实时</span>
+          <button class="ai-trigger-btn" id="ai-nav-btn">
+            <span class="ai-sparkle">✦</span> AI 助手
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="site-main">
+
+      <!-- HOME -->
+      <section id="home-section" class="content-section active">
+        <div class="hero glass-card fade-in">
+          <div class="hero-left">
+            <div class="hero-kicker">
+              <span class="kicker-chip">Governance Ecosystem</span>
+              <span class="kicker-sep">·</span>
+              <span class="kicker-tags">跨境治理 · 智能洞察 · 区域协同</span>
             </div>
-          </section>
-          <section id="china-section" class="panel-section" role="tabpanel">
-            <div class="map-frame">
-              <div class="map-frame-label">中国各省数字治理综合能力分布</div>
-              <div id="china-map-svg" class="map-canvas china-map-canvas"></div>
-              <div class="map-legend">
-                <div class="legend-title">综合评级</div>
-                <div class="legend-items">
-                  <div class="legend-item"><span class="legend-dot" style="background:#1abc9c"></span><span>优秀 ≥80</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#3498db"></span><span>良好 70–79</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#f39c12"></span><span>中等 62–69</span></div>
-                  <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span><span>待提升 &lt;62</span></div>
-                </div>
-              </div>
+            <h2>从中国地图评估到政策理解<br/>构建跨境治理协同生态</h2>
+            <p>围绕跨境电商治理场景，形成"地图感知 — 风险研判 — 政策导航 — 企业讨论 — 智能辅助"的治理生态闭环。</p>
+            <div class="hero-actions">
+              <button class="btn-primary" data-jump="map">进入地图计算</button>
+              <button class="btn-ghost" data-jump="policy">查看政策总览</button>
             </div>
-          </section>
+            <div class="trust-row">
+              <div class="trust-chip"><strong>31+</strong><span>省域样本</span></div>
+              <div class="trust-chip"><strong>5</strong><span>重点政策</span></div>
+              <div class="trust-chip"><strong>AI</strong><span>智能助手</span></div>
+            </div>
+          </div>
+          <div class="hero-right">
+            <div class="hero-stats-grid" id="hero-stats"></div>
+            <div class="hero-feature-grid">
+              <div class="hf-card hf-blue"><span class="hf-no">01</span><h3>交互式地图</h3><p>点击省份查看治理能力、问题与建议</p></div>
+              <div class="hf-card hf-jade"><span class="hf-no">02</span><h3>政策导航</h3><p>总览脉络，一键查看重点政策原文</p></div>
+              <div class="hf-card hf-gold"><span class="hf-no">03</span><h3>企业共议</h3><p>沉淀通关合规数据协同真实议题</p></div>
+              <div class="hf-card hf-purple"><span class="hf-no">04</span><h3>悬浮 AI</h3><p>右下角随时发起政策与地区提问</p></div>
+            </div>
+          </div>
         </div>
 
-        <div class="detail-col">
-          <div id="detail-panel" class="detail-panel"></div>
+        <div class="home-twin-grid">
+          <div class="panel glass-card">
+            <div class="panel-title">平台数据概览</div>
+            <div id="platform-stats" class="platform-stats"></div>
+          </div>
+          <div class="panel glass-card">
+            <div class="ptitle-row">
+              <div class="panel-title">省域治理能力排行</div>
+              <span class="panel-chip">TOP 10</span>
+            </div>
+            <div id="rankings-list" class="rankings-list"></div>
+          </div>
         </div>
-      </div>
-    </div>
-  </main>
 
-  <footer class="site-footer">
-    <div class="footer-inner">
-      <div class="footer-section">
-        <div class="footer-title">数据来源</div>
-        <div class="footer-items">
-          <span>Oxford Insights GAIR 政府AI准备度指数</span>
-          <span>联合国 EGDI 电子政务发展指数（2024）</span>
-          <span>复旦大学开放数林指数</span>
-          <span>浙江大学政府透明度指数</span>
-          <span>清华大学数字政府发展指数</span>
-          <span>CNNIC · 工信部统计公报</span>
+        <div class="home-triple-grid">
+          <div class="panel glass-card">
+            <div class="panel-title">治理生态闭环</div>
+            <div id="journey-steps" class="journey-steps"></div>
+          </div>
+          <div class="panel glass-card">
+            <div class="panel-title">平台核心亮点</div>
+            <div id="insights-list" class="insights-list"></div>
+          </div>
+          <div class="panel glass-card">
+            <div class="panel-title">典型治理流程</div>
+            <div id="gov-steps" class="gov-steps"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MAP -->
+      <section id="map-section" class="content-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow-label">China Governance Map</div>
+            <h2>地图计算界面</h2>
+          </div>
+          <div class="search-bar">
+            <span class="search-icon">⌕</span>
+            <input id="province-search-input" type="text" placeholder="输入省份名称，如浙江、广东…" autocomplete="off"/>
+            <button id="province-search-btn" class="btn-primary">查询</button>
+          </div>
+        </div>
+
+        <div class="map-layout">
+          <div class="panel glass-card map-panel">
+            <div class="panel-title">中国各省跨境治理能力地图</div>
+            <div id="china-map-svg" class="map-canvas"></div>
+            <div class="legend-row">
+              <span><em class="ldot" style="background:var(--jade)"></em>优秀 ≥80</span>
+              <span><em class="ldot" style="background:var(--blue)"></em>良好 70–79</span>
+              <span><em class="ldot" style="background:var(--orange)"></em>中等 62–69</span>
+              <span><em class="ldot" style="background:var(--red)"></em>待提升 &lt;62</span>
+            </div>
+          </div>
+          <div class="detail-col">
+            <div class="panel glass-card detail-panel" id="province-detail-panel"></div>
+            <div class="panel glass-card compare-panel" id="compare-panel" style="display:none">
+              <div class="compare-hd">
+                <span class="panel-title" style="margin:0">对比分析</span>
+                <button class="icon-btn" onclick="closeCompare()">✕</button>
+              </div>
+              <div id="compare-body" class="compare-body"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- POLICY -->
+      <section id="policy-section" class="content-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow-label">Policy Intelligence</div>
+            <h2>政策了解界面</h2>
+          </div>
+        </div>
+
+        <div class="panel glass-card policy-overview-panel">
+          <div class="panel-title">跨境治理政策总览</div>
+          <p id="policy-overview-text" class="overview-text"></p>
+          <div class="tag-filter-row" id="policy-tag-row">
+            <button class="tag-btn active" data-tag="all">全部</button>
+          </div>
+        </div>
+
+        <div class="policy-layout">
+          <div class="panel glass-card policy-list-panel">
+            <div class="panel-title">重点政策目录</div>
+            <div id="policy-list" class="policy-list"></div>
+          </div>
+          <div class="panel glass-card policy-detail-panel" id="policy-detail-panel"></div>
+        </div>
+      </section>
+
+      <!-- DISCUSSION -->
+      <section id="discussion-section" class="content-section">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow-label">Enterprise Exchange</div>
+            <h2>企业讨论界面</h2>
+          </div>
+        </div>
+
+        <div class="discussion-layout">
+          <div class="panel glass-card disc-panel">
+            <div class="panel-title">企业讨论广场</div>
+            <div id="discussion-feed" class="disc-feed"></div>
+          </div>
+
+          <div class="disc-side">
+            <div class="panel glass-card disc-form">
+              <div class="panel-title">发起讨论</div>
+              <div class="form-group">
+                <label>企业 / 机构</label>
+                <input id="discussion-company" type="text" placeholder="如：华东跨境服务中心"/>
+              </div>
+              <div class="form-group">
+                <label>讨论主题</label>
+                <input id="discussion-topic" type="text" placeholder="如：跨境数据申报协同"/>
+              </div>
+              <div class="form-group">
+                <label>内容</label>
+                <textarea id="discussion-content" rows="5" placeholder="输入问题、经验或建议…"></textarea>
+              </div>
+              <button id="discussion-submit" class="btn-primary full-btn">发布讨论</button>
+              <div id="discussion-tip" class="submit-tip"></div>
+            </div>
+
+            <div class="panel glass-card hot-panel">
+              <div class="panel-title">🔥 热门话题</div>
+              <div id="hot-topics" class="hot-topics"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- FLOATING AI PANEL -->
+  <div id="ai-panel" class="ai-panel">
+    <div class="ai-panel-head">
+      <div class="ai-head-info">
+        <div class="ai-avatar">✦</div>
+        <div>
+          <div class="ai-name">治理 AI 助手</div>
+          <div class="ai-desc">政策 · 省域 · 讨论热点</div>
         </div>
       </div>
-      <div class="footer-section footer-right">
-        <div class="footer-title">第十六届全国大学生电子商务"创新、创意及创业"挑战赛</div>
-        <div class="footer-items">
-          <span>北京理工大学管理与经济学院</span>
-          <span>国家尺度 × 省域尺度 · 两层指标体系</span>
-          <span>六维评估框架 · 2024年数据</span>
-        </div>
-      </div>
+      <button id="ai-close" class="ai-close">✕</button>
     </div>
-  </footer>
+    <div id="ai-messages" class="ai-messages"></div>
+    <div id="ai-quick" class="ai-quick"></div>
+    <div class="ai-input-row">
+      <input id="ai-input" type="text" placeholder="提问政策、省份或治理热点…"/>
+      <button id="ai-send" class="ai-send">↑</button>
+    </div>
+  </div>
+
+  <button id="ai-fab" class="ai-fab" aria-label="打开AI助手">
+    <span class="fab-pulse"></span>
+    <span class="fab-core">✦</span>
+  </button>
 
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <script src="data.js"></script>
   <script src="app.js"></script>
 </body>
