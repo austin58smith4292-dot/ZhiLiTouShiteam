@@ -67,10 +67,8 @@
   ];
 
   const quickPrompts = [
-    '跨境数据治理相关政策有哪些？',
-    '广东治理优势是什么？',
-    '综合能力排名前三的省份？',
-    '海外仓建设对应哪些政策？',
+    '综合排名前三的省份是？', '广东治理优势是什么？',
+    '跨境数据治理相关政策有哪些？', '开放度最低的地区有哪些？',
     '企业讨论中最集中的问题？'
   ];
 
@@ -83,23 +81,12 @@
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
-    bindNav();
-    bindButtons();
-    initAIChat();
-    renderHeroStats();
-    renderPlatformStats();
-    renderRankings();
-    renderJourneySteps();
-    renderInsights();
-    renderGovSteps();
-    renderProvinceWelcome();
-    renderPolicyOverview();
-    buildPolicyTags();
-    renderPolicyList();
-    renderPolicyDetail(policyData[0]);
-    renderDiscussionFeed();
-    renderHotTopics();
-    loadChinaMap();
+    bindNav(); bindButtons(); initAIChat();
+    renderHeroStats(); renderPlatformStats(); renderRankings();
+    renderJourneySteps(); renderInsights(); renderGovSteps();
+    renderProvinceWelcome(); renderPolicyOverview();
+    buildPolicyTags(); renderPolicyList(); renderPolicyDetail(policyData[0]);
+    renderDiscussionFeed(); renderHotTopics(); loadChinaMap();
   }
 
   /* ===== NAV ===== */
@@ -130,7 +117,7 @@
   /* ===== HOME ===== */
   function renderHeroStats() {
     const top = [...chinaData].sort((a, b) => b.total - a.total);
-    const avg = (chinaData.reduce((s, p) => s + p.total, 0) / chinaData.length).toFixed(1);
+    const avg = (chinaData.reduce((s, p) => s + p.total, 0) / chinaData.length * 100).toFixed(1);
     const items = [
       { v: chinaData.length + '+', l: '省域治理样本' },
       { v: avg, l: '平均综合得分' },
@@ -143,8 +130,7 @@
   }
 
   function renderPlatformStats() {
-    const excellent = chinaData.filter(p => p.total >= 80).length;
-    const good = chinaData.filter(p => p.total >= 70 && p.total < 80).length;
+    const excellent = chinaData.filter(p => p.total >= 0.7).length;
     const items = [
       { v: chinaData.length, l: '收录省份' },
       { v: policyData.length, l: '重点政策' },
@@ -160,13 +146,13 @@
     const top10 = [...chinaData].sort((a, b) => b.total - a.total).slice(0, 10);
     document.getElementById('rankings-list').innerHTML = top10.map((p, i) => {
       const lvl = getProvinceLevel(p.total);
-      const pct = p.total.toFixed(1);
+      const pct = (p.total * 100).toFixed(1);
       return `<div class="ranking-item" onclick="goToProvince('${p.name}')">
         <div class="rank-num ${i < 3 ? 'top3' : ''}">${i + 1}</div>
         <div class="rank-info">
           <div class="rank-name">${p.name}</div>
           <div class="rank-bar-track">
-            <div class="rank-bar-fill" style="width:${p.total}%;background:${lvl.color}"></div>
+            <div class="rank-bar-fill" style="width:${p.total * 100}%;background:${lvl.color}"></div>
           </div>
         </div>
         <div class="rank-score" style="color:${lvl.color}">${pct}</div>
@@ -177,9 +163,9 @@
   function renderJourneySteps() {
     const steps = [
       ['省域感知', '通过中国地图直观看到治理能力梯度与评级分布。'],
-      ['问题识别', '从数字政府、开放度、透明度等维度诊断地区短板。'],
-      ['政策理解', '浏览跨境治理政策总览并进入具体政策原文。'],
-      ['企业反馈', '汇聚企业讨论，形成实务问题池与热点话题。'],
+      ['问题识别', '从数字政府、开放度、透明度三维度诊断地区短板。'],
+      ['政策导航', '浏览跨境治理政策总览并进入具体政策原文。'],
+      ['企业论坛', '汇聚企业讨论，形成实务问题池与热点话题。'],
       ['AI 协同', '快速检索政策、地区、讨论与优化建议。']
     ];
     document.getElementById('journey-steps').innerHTML = steps.map(([k, v]) =>
@@ -189,8 +175,8 @@
 
   function renderInsights() {
     const items = [
-      ['图', '可视化更聚焦', '强化地图、政策与 AI 入口联动，核心功能一眼可见。'],
-      ['策', '信息密度合理', '将复杂治理流程拆解为卡片、指标和路径，减轻阅读压力。'],
+      ['图', '可视化更聚焦', '强化地图、雷达图与 AI 入口联动，核心功能一眼可见。'],
+      ['策', '三维指标体系', '数字政府 · 开放度 · 透明度三项权威指标综合评价。'],
       ['智', '交互入口明确', '通过按钮、悬浮助手和卡片，把用户直接引导到关键操作。']
     ];
     document.getElementById('insights-list').innerHTML = items.map(([ico, t, d]) =>
@@ -203,7 +189,7 @@
 
   function renderGovSteps() {
     const steps = [
-      ['STEP 1', '区域识别', '从地图点击目标省份，查看治理评分与问题画像。'],
+      ['STEP 1', '区域识别', '从地图点击目标省份，查看治理评分与三维雷达画像。'],
       ['STEP 2', '政策匹配', '快速定位相关政策，理解制度支撑与规则边界。'],
       ['STEP 3', '企业反馈', '结合真实讨论议题，识别执行层面难点与差异。'],
       ['STEP 4', 'AI 提问', '围绕地区、政策或问题继续追问，形成治理建议。']
@@ -222,53 +208,114 @@
     const sorted = [...chinaData].sort((a, b) => b.total - a.total).slice(0, 5);
     document.getElementById('province-detail-panel').innerHTML = `
       <div class="welcome-card">
-        <h3>中国省域治理能力</h3>
-        <p>地图支持交互点击。点击任意省份即可查看综合得分、治理问题与优化建议。点击"对比分析"可并排比较两省。</p>
+        <h3>省域跨境治理能力地图</h3>
+        <p>基于<strong>数字政府发展指数</strong>（清华）、<strong>开放度综合指数</strong>（复旦）、<strong>透明度总分</strong>（浙大）三项权威指标，采用熵值法合成综合评分。点击任意省份查看详细雷达画像。</p>
         <div class="top-list">
           ${sorted.map((p, i) => {
             const lvl = getProvinceLevel(p.total);
             return `<div class="top-item" onclick="goToMapProvince('${p.name}')">
-              <strong>TOP ${i + 1} · ${p.name}</strong> &nbsp; 综合得分 ${p.total.toFixed(1)}，评级 <span style="color:${lvl.color}">${lvl.level}</span>
+              <strong>TOP ${i + 1} · ${p.name}</strong> &nbsp; 综合评分 ${(p.total * 100).toFixed(1)}，评级 <span style="color:${lvl.color};font-weight:700">${lvl.level}</span>
             </div>`;
           }).join('')}
         </div>
       </div>`;
   }
 
+  /* ===== RADAR CHART ===== */
+  function drawRadarChart(p) {
+    const size = 200;
+    const cx = size / 2, cy = size / 2 + 6;
+    const R = 70;
+    const angles = [-Math.PI / 2, Math.PI / 6, 5 * Math.PI / 6];
+    const labels = ['数字政府', '开放度', '透明度'];
+    const maxVals = [83.03, 78.47, 85.11];
+    const rawVals = [p.digitalGov, p.openness, p.transparency];
+    const normVals = rawVals.map((v, i) => Math.min(v / maxVals[i], 1));
+    const lvl = getProvinceLevel(p.total);
+
+    let svg = '';
+    // Grid
+    [0.25, 0.5, 0.75, 1.0].forEach(level => {
+      const pts = angles.map(a => {
+        const r = R * level;
+        return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+      }).join(' ');
+      svg += `<polygon points="${pts}" fill="none" stroke="${level === 1 ? 'rgba(13,110,92,0.3)' : 'rgba(13,110,92,0.1)'}" stroke-width="${level === 1 ? 1.2 : 0.7}"/>`;
+    });
+    // Axes
+    angles.forEach(a => {
+      svg += `<line x1="${cx}" y1="${cy}" x2="${(cx + R * Math.cos(a)).toFixed(1)}" y2="${(cy + R * Math.sin(a)).toFixed(1)}" stroke="rgba(13,110,92,0.18)" stroke-width="1"/>`;
+    });
+    // Data polygon
+    const pts = angles.map((a, i) => {
+      const r = R * normVals[i];
+      return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+    });
+    svg += `<polygon points="${pts.join(' ')}" fill="${lvl.color}22" stroke="${lvl.color}" stroke-width="2" stroke-linejoin="round"/>`;
+    // Points
+    angles.forEach((a, i) => {
+      const r = R * normVals[i];
+      svg += `<circle cx="${(cx + r * Math.cos(a)).toFixed(1)}" cy="${(cy + r * Math.sin(a)).toFixed(1)}" r="3.5" fill="${lvl.color}" stroke="white" stroke-width="1.5"/>`;
+    });
+    // Labels
+    const ld = R + 20;
+    angles.forEach((a, i) => {
+      const lx = cx + ld * Math.cos(a);
+      const ly = cy + ld * Math.sin(a);
+      const ta = i === 0 ? 'middle' : (i === 1 ? 'start' : 'end');
+      svg += `<text x="${lx.toFixed(1)}" y="${(ly - 4).toFixed(1)}" text-anchor="${ta}" font-size="8.5" fill="#4a5e5c" font-weight="600" font-family="sans-serif">${labels[i]}</text>`;
+      svg += `<text x="${lx.toFixed(1)}" y="${(ly + 7).toFixed(1)}" text-anchor="${ta}" font-size="9" fill="${lvl.color}" font-weight="700" font-family="sans-serif">${rawVals[i].toFixed(1)}</text>`;
+    });
+
+    return `<svg viewBox="0 0 ${size} ${size + 10}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:200px;display:block;margin:0 auto">${svg}</svg>`;
+  }
+
   function renderProvinceDetail(p) {
     selectedProvince = p;
     const lvl = getProvinceLevel(p.total);
-    const badgeStyle = `background:${lvl.color}16;color:${lvl.color};border:1px solid ${lvl.color}40`;
+    const badgeStyle = `background:${lvl.color}18;color:${lvl.color};border:1px solid ${lvl.color}50`;
+    const scoreDisplay = (p.total * 100).toFixed(1);
+
     const metrics = [
-      { label: '网民规模', val: p.internetUsers },
-      { label: '宽带用户', val: p.broadband },
-      { label: '移动电话', val: p.mobile },
-      { label: '数字政府', val: p.digitalGov },
-      { label: '数据开放', val: p.openness },
-      { label: '政务透明', val: p.transparency }
+      { label: '数字政府发展指数', val: p.digitalGov, max: 83.03, color: '#0d6e5c', sub: '清华大学 · 权重 0.345' },
+      { label: '开放度综合指数', val: p.openness, max: 78.47, color: '#2563a8', sub: '复旦大学 · 权重 0.306' },
+      { label: '透明度总分', val: p.transparency, max: 85.11, color: '#c77a1a', sub: '浙江大学 · 权重 0.349' }
     ];
-    const maxVal = 100;
-    const metricColors = ['var(--blue)', 'var(--jade)', 'var(--purple)', 'var(--gold)', 'var(--orange)', 'var(--jade-l)'];
 
     document.getElementById('province-detail-panel').innerHTML = `
       <div class="province-card">
-        <div class="score-badge" style="${badgeStyle}">${lvl.level}</div>
-        <h3>${p.name}</h3>
-        <div class="score-num">${p.total.toFixed(1)}</div>
-        <div class="score-sub">省域跨境治理综合评分</div>
-        <div class="metric-bars">
-          ${metrics.map((m, i) => `
-            <div class="metric-row">
-              <div class="metric-label">${m.label}</div>
-              <div class="metric-track"><div class="metric-fill" style="width:${Math.min(m.val, 100)}%;background:${metricColors[i]}"></div></div>
-              <div class="metric-val">${m.val.toFixed(1)}</div>
-            </div>`).join('')}
+        <div class="province-card-top">
+          <div class="province-title-row">
+            <h3>${p.name}</h3>
+            <div class="score-badge" style="${badgeStyle}">${lvl.level}</div>
+          </div>
+          <div class="score-num">${scoreDisplay}<span class="score-unit"> / 100</span></div>
+          <div class="score-sub">省域跨境治理综合评分（熵值法）</div>
+        </div>
+        <div class="province-body">
+          <div class="radar-section">
+            <div class="radar-title">三维指标雷达图</div>
+            ${drawRadarChart(p)}
+          </div>
+          <div class="metrics-section">
+            ${metrics.map(m => `
+              <div class="metric-row">
+                <div class="metric-header">
+                  <span class="metric-label">${m.label}</span>
+                  <span class="metric-val" style="color:${m.color}">${m.val.toFixed(1)}</span>
+                </div>
+                <div class="metric-track">
+                  <div class="metric-fill" style="width:${(m.val / m.max * 100).toFixed(1)}%;background:${m.color}"></div>
+                </div>
+                <div class="metric-sub">${m.sub}</div>
+              </div>`).join('')}
+          </div>
         </div>
         <div class="probs">
-          ${p.problems.slice(0, 3).map(x => `<div class="prob-item">⚠ ${x}</div>`).join('')}
+          ${p.problems.slice(0, 2).map(x => `<div class="prob-item">⚠ ${x}</div>`).join('')}
         </div>
         <div class="advs">
-          ${p.solutions.slice(0, 3).map(x => `<div class="adv-item">✓ ${x}</div>`).join('')}
+          ${p.solutions.slice(0, 2).map(x => `<div class="adv-item">✓ ${x}</div>`).join('')}
         </div>
         <button class="compare-trigger" onclick="startCompare('${p.name}')">对比分析 →</button>
       </div>`;
@@ -291,15 +338,12 @@
     });
   }
 
-  /* Compare */
   window.startCompare = function(name) {
     const p = chinaData.find(x => x.name === name);
     if (!p) return;
-    compareMode = true;
-    compareProvince = p;
+    compareMode = true; compareProvince = p;
     const panel = document.getElementById('province-detail-panel');
-    const existing = panel.querySelector('.compare-mode-note');
-    if (!existing) {
+    if (!panel.querySelector('.compare-mode-note')) {
       const note = document.createElement('div');
       note.className = 'compare-mode-note';
       note.textContent = '请在地图上点击另一省份进行对比分析';
@@ -314,33 +358,30 @@
 
   function doCompare(p2) {
     const p1 = compareProvince;
-    const panel = document.getElementById('compare-panel');
-    panel.style.display = 'block';
+    document.getElementById('compare-panel').style.display = 'block';
     const metrics = [
-      { label: '网民规模', k: 'internetUsers' },
-      { label: '宽带用户', k: 'broadband' },
-      { label: '移动电话', k: 'mobile' },
-      { label: '数字政府', k: 'digitalGov' },
-      { label: '数据开放', k: 'openness' },
-      { label: '政务透明', k: 'transparency' }
+      { label: '数字政府', k: 'digitalGov', max: 83.03 },
+      { label: '开放度', k: 'openness', max: 78.47 },
+      { label: '透明度', k: 'transparency', max: 85.11 }
     ];
-    const renderCol = (p, color) => `
+    const colors = ['#0d6e5c', '#2563a8', '#c77a1a'];
+    const renderCol = (p, baseColor) => `
       <div class="cmp-col">
         <div class="cmp-name">${p.name}</div>
-        <div class="cmp-score" style="color:${getProvinceLevel(p.total).color}">${p.total.toFixed(1)}</div>
+        <div class="cmp-score" style="color:${getProvinceLevel(p.total).color}">${(p.total * 100).toFixed(1)}</div>
+        <div class="cmp-radar">${drawRadarChart(p)}</div>
         <div class="cmp-bar-row">
-          ${metrics.map(m => `
+          ${metrics.map((m, i) => `
             <div class="cmp-row">
               <div class="cmp-label">${m.label}</div>
-              <div class="cmp-track"><div class="cmp-fill" style="width:${p[m.k]}%;background:${color}"></div></div>
+              <div class="cmp-track"><div class="cmp-fill" style="width:${(p[m.k] / m.max * 100).toFixed(1)}%;background:${colors[i]}"></div></div>
               <div class="cmp-val">${p[m.k].toFixed(1)}</div>
             </div>`).join('')}
         </div>
       </div>`;
     document.getElementById('compare-body').innerHTML =
       renderCol(p1, 'var(--jade)') + renderCol(p2, 'var(--blue)');
-    compareMode = false;
-    compareProvince = null;
+    compareMode = false; compareProvince = null;
   }
 
   /* ===== POLICY ===== */
@@ -387,7 +428,7 @@
   function renderPolicyDetail(p) {
     selectedPolicy = p;
     document.getElementById('policy-detail-panel').innerHTML = `
-      <div class="pol-detail" style="padding:8px">
+      <div class="pol-detail">
         <h3>${p.title}</h3>
         <div class="pol-meta-row">发布机构：${p.org} &nbsp;·&nbsp; 发布年份：${p.year}</div>
         <p>${p.content}</p>
@@ -420,16 +461,14 @@
   }
 
   window.toggleLike = function(id) {
-    if (likedItems.has(id)) likedItems.delete(id);
-    else likedItems.add(id);
+    if (likedItems.has(id)) likedItems.delete(id); else likedItems.add(id);
     renderDiscussionFeed();
   };
 
   function renderHotTopics() {
-    const clsMap = ['h1', 'h2', 'h3'];
     document.getElementById('hot-topics').innerHTML = hotTopics.map((t, i) => `
       <div class="hot-item" onclick="fillTopic('${t}')">
-        <span class="hot-no ${clsMap[i] || ''}">${i + 1}</span>
+        <span class="hot-no ${i < 3 ? 'h' + (i+1) : ''}">${i + 1}</span>
         <span class="hot-text">${t}</span>
       </div>`).join('');
   }
@@ -443,8 +482,7 @@
     const company = v('discussion-company'), topic = v('discussion-topic'), content = v('discussion-content');
     const tip = document.getElementById('discussion-tip');
     if (!company || !topic || !content) { tip.textContent = '请完整填写企业、主题和内容。'; return; }
-    const id = 'u' + Date.now();
-    discussions.unshift({ id, company, topic, content, time: '刚刚', likes: 0 });
+    discussions.unshift({ id: 'u' + Date.now(), company, topic, content, time: '刚刚', likes: 0 });
     renderDiscussionFeed();
     ['discussion-company', 'discussion-topic', 'discussion-content'].forEach(x => document.getElementById(x).value = '');
     tip.textContent = '讨论已发布！';
@@ -457,8 +495,7 @@
     document.getElementById('ai-close').addEventListener('click', closeAIChat);
     document.getElementById('ai-send').addEventListener('click', sendAIMessage);
     document.getElementById('ai-input').addEventListener('keydown', e => { if (e.key === 'Enter') sendAIMessage(); });
-
-    addAIMessage('bot', '你好，我是跨境治理 AI 助手 ✦\n\n可以问我政策、地区能力、企业讨论热点，或让我帮你查找相关内容。');
+    addAIMessage('bot', '你好，我是跨境治理 AI 助手 ✦\n\n可以问我政策、省域三维指标画像、企业论坛热点，或让我帮你查找相关内容。');
     renderAIQuick();
   }
 
@@ -480,31 +517,22 @@
     document.getElementById('ai-fab').classList.remove('is-open');
   }
 
-  window.askQuick = function(q) {
-    document.getElementById('ai-input').value = q;
-    sendAIMessage();
-  };
+  window.askQuick = function(q) { document.getElementById('ai-input').value = q; sendAIMessage(); };
 
   function sendAIMessage() {
     const input = document.getElementById('ai-input');
     const q = input.value.trim();
     if (!q) return;
-    addAIMessage('user', q);
-    input.value = '';
-    const tid = 'typing_' + Date.now();
-    addTypingIndicator(tid);
-    setTimeout(() => {
-      removeTypingIndicator(tid);
-      addAIMessage('bot', answerQuestion(q));
-    }, 700 + Math.random() * 500);
+    addAIMessage('user', q); input.value = '';
+    const tid = 'typing_' + Date.now(); addTypingIndicator(tid);
+    setTimeout(() => { removeTypingIndicator(tid); addAIMessage('bot', answerQuestion(q)); }, 700 + Math.random() * 500);
   }
 
   function addAIMessage(role, text) {
     const box = document.getElementById('ai-messages');
     const wrap = document.createElement('div');
     wrap.className = `ai-msg ${role === 'user' ? 'user' : ''}`;
-    wrap.innerHTML = `
-      <div class="ai-msg-label">${role === 'user' ? '你' : 'AI 助手'}</div>
+    wrap.innerHTML = `<div class="ai-msg-label">${role === 'user' ? '你' : 'AI 助手'}</div>
       <div class="ai-bubble">${text.replace(/\n/g, '<br>')}</div>`;
     box.appendChild(wrap);
     box.scrollTop = box.scrollHeight;
@@ -520,45 +548,44 @@
     box.scrollTop = box.scrollHeight;
   }
 
-  function removeTypingIndicator(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-  }
+  function removeTypingIndicator(id) { const el = document.getElementById(id); if (el) el.remove(); }
 
   function answerQuestion(q) {
     const s = q.toLowerCase();
     const province = chinaData.find(p => s.includes(p.name) || q.includes(p.name));
     if (province) {
       const lvl = getProvinceLevel(province.total);
-      return `${province.name}综合得分 ${province.total.toFixed(1)}，评级「${lvl.level}」。\n\n数字政府 ${province.digitalGov.toFixed(1)}，数据开放 ${province.openness.toFixed(1)}，政务透明 ${province.transparency.toFixed(1)}。\n\n主要短板：${province.problems.slice(0, 2).join('；')}。`;
+      return `${province.name}综合评分 ${(province.total * 100).toFixed(1)}，评级「${lvl.level}」。\n\n三维指标：\n· 数字政府 ${province.digitalGov.toFixed(1)}（清华·权重0.345）\n· 开放度 ${province.openness.toFixed(1)}（复旦·权重0.306）\n· 透明度 ${province.transparency.toFixed(1)}（浙大·权重0.349）\n\n主要短板：${province.problems.slice(0, 1).join('；')}。`;
     }
     const policy = policyData.find(p => q.includes(p.title.slice(0, 8)) || p.tags.some(t => q.includes(t)));
     if (policy) {
-      return `推荐查看《${policy.title}》。\n\n${policy.org} · ${policy.year}年发布，核心内容包括：\n${policy.highlights.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\n右侧政策界面可直接点开查看原文。`;
+      return `推荐查看《${policy.title}》。\n\n${policy.org} · ${policy.year}年发布，核心内容包括：\n${policy.highlights.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\n右侧政策导航界面可直接点开查看原文。`;
+    }
+    if (s.includes('开放') && (s.includes('低') || s.includes('最低'))) {
+      const bottom5 = [...chinaData].sort((a, b) => a.openness - b.openness).slice(0, 5);
+      return `开放度最低的5个省份：\n${bottom5.map(p => `· ${p.name}（开放度 ${p.openness.toFixed(1)} 分）`).join('\n')}\n\n这些省份在复旦大学开放数林指数上得分偏低，公共数据开放程度有较大提升空间。`;
     }
     if (s.includes('政策') || s.includes('数据') || s.includes('治理'))
       return '跨境治理政策主要分为五类：\n1. 跨境电商高质量发展\n2. 海外仓与物流建设\n3. 零售进口监管\n4. 数据出境安全\n5. 外贸稳规模与结构优化\n\n可进一步说明想查哪一类。';
-    if (s.includes('讨论') || s.includes('企业'))
-      return `当前企业讨论中较集中的主题有：\n${discussions.slice(0, 3).map(d => `· ${d.topic}`).join('\n')}\n\n主要聚焦数据接口统一、海外仓协同和地方政策执行差异。`;
-    const top3 = [...chinaData].sort((a, b) => b.total - a.total).slice(0, 3).map(p => `${p.name}(${p.total.toFixed(1)})`).join('、');
-    return `我可以帮你查询政策、省份治理能力和企业讨论内容。\n\n当前综合能力较强的省份：${top3}。\n\n你可以按"省份名称""政策主题"或"企业问题关键词"继续提问。`;
+    if (s.includes('讨论') || s.includes('企业') || s.includes('论坛'))
+      return `当前企业论坛中较集中的主题有：\n${discussions.slice(0, 3).map(d => `· ${d.topic}`).join('\n')}\n\n主要聚焦数据接口统一、海外仓协同和地方政策执行差异。`;
+    const top3 = [...chinaData].sort((a, b) => b.total - a.total).slice(0, 3).map(p => `${p.name}(${(p.total * 100).toFixed(1)})`).join('、');
+    return `我可以帮你查询政策、省份三维指标和企业论坛内容。\n\n当前综合能力较强的省份：${top3}。\n\n可按"省份名称""政策主题"或"企业问题关键词"继续提问。`;
   }
 
   /* ===== D3 MAP ===== */
   function loadChinaMap() {
     const c = document.getElementById('china-map-svg');
     if (!c || !window.CHINA_PROVINCES_GEOJSON) return;
-    const existingSvg = c.querySelector('svg');
-    if (existingSvg) return;
+    if (c.querySelector('svg')) return;
     const w = c.clientWidth || 860, h = c.clientHeight || 600;
     const svg = d3.select(c).append('svg').attr('width', '100%').attr('height', '100%').attr('viewBox', `0 0 ${w} ${h}`);
 
-    // Subtle grid
     const defs = svg.append('defs');
-    const pat = defs.append('pattern').attr('id', 'grid').attr('width', 28).attr('height', 28).attr('patternUnits', 'userSpaceOnUse');
-    pat.append('circle').attr('cx', 1).attr('cy', 1).attr('r', .8).attr('fill', 'rgba(100,140,130,.2)');
-    svg.append('rect').attr('width', w).attr('height', h).attr('fill', '#f8f4ed');
-    svg.append('rect').attr('width', w).attr('height', h).attr('fill', 'url(#grid)');
+    const pat = defs.append('pattern').attr('id', 'mapgrid').attr('width', 28).attr('height', 28).attr('patternUnits', 'userSpaceOnUse');
+    pat.append('circle').attr('cx', 1).attr('cy', 1).attr('r', .8).attr('fill', 'rgba(100,140,130,.15)');
+    svg.append('rect').attr('width', w).attr('height', h).attr('fill', '#f2efe8');
+    svg.append('rect').attr('width', w).attr('height', h).attr('fill', 'url(#mapgrid)');
 
     const g = svg.append('g');
     const tooltip = d3.select(c).append('div').attr('class', 'map-tooltip');
@@ -583,17 +610,16 @@
         const lvl = getProvinceLevel(p.total);
         tooltip.style('display', 'block').html(
           `<strong>${p.name}</strong>
-           <span>综合得分：${p.total.toFixed(1)} · <span style="color:${lvl.color}">${lvl.level}</span></span>
-           <span>数字政府 ${p.digitalGov.toFixed(1)} · 开放度 ${p.openness.toFixed(1)}</span>`
+           <span>综合评分：${(p.total * 100).toFixed(1)} · <span style="color:${lvl.color};font-weight:700">${lvl.level}</span></span>
+           <span>数字政府 ${p.digitalGov.toFixed(1)} · 开放度 ${p.openness.toFixed(1)} · 透明度 ${p.transparency.toFixed(1)}</span>`
         );
       })
       .on('mousemove', e => {
         const [x, y] = d3.pointer(e, c);
-        tooltip.style('left', `${x + 14}px`).style('top', `${y - 46}px`);
+        tooltip.style('left', `${x + 14}px`).style('top', `${y - 56}px`);
       })
       .on('mouseout', function(e, d) {
-        const isSelected = d3.select(this).classed('selected');
-        if (!isSelected) d3.select(this).attr('stroke', 'rgba(255,255,255,.7)').attr('stroke-width', .6);
+        if (!d3.select(this).classed('selected')) d3.select(this).attr('stroke', 'rgba(255,255,255,.7)').attr('stroke-width', .6);
         tooltip.style('display', 'none');
       })
       .on('click', function(e, d) {
@@ -611,7 +637,6 @@
         showSection('map');
       });
 
-    // Labels
     g.selectAll('text').data(geo.features).enter().append('text')
       .attr('transform', d => `translate(${path.centroid(d)})`)
       .attr('text-anchor', 'middle').attr('font-size', '8.5px')
@@ -652,18 +677,17 @@
     if (adcode && provinceCodeMap[+adcode]) return provinceCodeMap[+adcode];
     const clean = String(name || '').replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '');
     for (const k of Object.keys(provinceNameMap)) { if (clean === k || clean.includes(k) || k.includes(clean)) return provinceCodeMap[provinceNameMap[k]]; }
-    const aliases = { InnerMongolia: '内蒙古', NeiMongol: '内蒙古', Hongkong: '香港', Macau: '澳门', Taiwan: '台湾', Xizang: '西藏', Xinjiang: '新疆', Ningxia: '宁夏', Guangxi: '广西', Qinghai: '青海', Shaanxi: '陕西', Chongqing: '重庆', Heilongjiang: '黑龙江', Jiangxi: '江西', Hubei: '湖北', Hunan: '湖南', Guangdong: '广东', Beijing: '北京', Shanghai: '上海', Tianjin: '天津', Hebei: '河北', Shanxi: '山西', Liaoning: '辽宁', Jilin: '吉林', Shandong: '山东', Henan: '河南', Jiangsu: '江苏', Zhejiang: '浙江', Fujian: '福建', Hainan: '海南', Sichuan: '四川', Guizhou: '贵州', Yunnan: '云南', Gansu: '甘肃' };
+    const aliases = { InnerMongolia: '内蒙古', NeiMongol: '内蒙古', Hongkong: '香港', Macau: '澳门', Taiwan: '台湾', Xizang: '西藏', Xinjiang: '新疆', Ningxia: '宁夏', Guangxi: '广西', Qinghai: '青海', Shaanxi: '陕西', Chongqing: '重庆', Heilongjiang: '黑龙江', Jiangxi: '江西', Hubei: '湖北', Hunan: '湖南', Guangdong: '广东', Beijing: '北京', Shanghai: '上海', Tianjin: '天津', Hebei: '河北', Shanxi: '山西', Liaoning: '辽宁', Jilin: '吉林', Shandong: '山东', Henan: '河南', Jiangsu: '江苏', Zhejiang: '浙江', Fujian: '福建', Hainan: '海南', Sichuan: '四川', Guizhou: '贵州', Yunnan: '云南', Gansu: '甘肃', Qianghai: '青海', Tibet: '西藏' };
     const mapped = aliases[clean] || aliases[clean.replace(/\s+/g, '')];
     if (mapped && provinceNameMap[mapped]) return provinceCodeMap[provinceNameMap[mapped]];
     return null;
   }
 
-  /* ===== WINDOW EXPORTS ===== */
+  /* ===== EXPORTS ===== */
   window.goToProvince = function(name) { showSection('map'); setTimeout(() => { const p = chinaData.find(x => x.name === name); if (p) { renderProvinceDetail(p); highlightProvince(name); } }, 80); };
   window.goToMapProvince = function(name) { const p = chinaData.find(x => x.name === name); if (p) { renderProvinceDetail(p); highlightProvince(name); } };
   window.filterPolicy = filterPolicy;
   window.selectPolicy = function(id) { const p = policyData.find(x => x.id === id); if (p) { renderPolicyDetail(p); renderPolicyList(); } };
 
   function v(id) { return document.getElementById(id).value.trim(); }
-
 })();

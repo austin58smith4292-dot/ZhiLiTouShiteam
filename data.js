@@ -208,59 +208,58 @@ worldData.forEach(d => { countryCodeMap[d.isoCode] = d; });
 //       清华数字政府指数、CNNIC网民规模、工信部统计公报
 // ============================================================
 
+// ============================================================
+// 三项省域指标说明（熵值法合成，权重来自第四章4.2节）：
+// digitalGov   - 清华大学中国数字政府发展指数总得分 (0-100)  权重 0.345
+// openness     - 复旦大学中国开放数林指数综合得分   (0-100)  权重 0.306
+// transparency - 浙江大学中国政府网络透明度指数总分 (0-100)  权重 0.349
+// total        - 熵值法极差标准化后综合得分         (0-1 scale)
+// ============================================================
+
 function getProvinceProblems(p) {
   const problems = [];
   const solutions = [];
 
-  // 开放度分析
+  // 开放度分析（复旦开放数林指数）
   if (p.openness < 10) {
-    problems.push("公共数据开放程度极低（开放度指数＜10），数据孤岛问题突出，政企数据协同共享机制近乎缺失，严重制约跨境电商监管精准性");
+    problems.push(`公共数据开放程度极低（开放度指数 ${p.openness.toFixed(1)} 分），数据孤岛问题突出，政企数据协同共享机制近乎缺失，严重制约跨境电商监管精准性`);
     solutions.push("建立省级一体化数据开放平台，制定数据开放优先清单，将跨境电商相关海关、税务、市场监管数据纳入重点开放范畴，推动机器可读数据集常态化更新");
   } else if (p.openness < 25) {
-    problems.push(`公共数据开放指数偏低（${p.openness.toFixed(1)}分），数据公开质量与可机读性不足，跨境电商监管部门间数据贯通能力受限`);
+    problems.push(`公共数据开放指数偏低（${p.openness.toFixed(1)} 分），数据公开质量与可机读性不足，跨境电商监管部门间数据贯通能力受限`);
     solutions.push("完善数据开放制度规范，提升开放数据时效性与机器可读率，建立跨部门数据共享清单，推进商务、海关、税务数据标准统一");
-  } else if (p.openness < 45) {
-    problems.push(`数据开放水平处于中等（${p.openness.toFixed(1)}分），部分重要跨境电商相关数据集尚未纳入开放范围，数据利用效率有待提升`);
-    solutions.push("扩大数据开放范畴，优先开放综试区贸易统计、企业主体、通关时效等跨境电商核心数据，建立数据开放质量评估机制");
+  } else if (p.openness < 50) {
+    problems.push(`数据开放水平中等（${p.openness.toFixed(1)} 分），部分跨境电商关键数据集尚未纳入开放范围，数据利用效率有待提升`);
+    solutions.push("扩大数据开放范畴，优先开放综试区贸易统计、企业主体、通关时效等核心数据，建立数据开放质量评估机制");
   }
 
-  // 数字政府分析
+  // 数字政府分析（清华数字政府发展指数）
   if (p.digitalGov < 60) {
-    problems.push(`数字政府发展指数较低（${p.digitalGov.toFixed(1)}分），跨部门数字化协同水平有限，"四单对碰"等监管机制信息化落实存在短板`);
+    problems.push(`数字政府发展指数较低（${p.digitalGov.toFixed(1)} 分），跨部门数字化协同水平有限，"四单对碰"等监管机制信息化落实存在明显短板`);
     solutions.push("加大数字政府建设专项投入，重点推进政务系统整合与互联互通，构建跨部门数据共享交换平台，提升海关-税务-外汇联合稽查的数字化能力");
   } else if (p.digitalGov < 70) {
-    problems.push(`数字政府综合能力有待提升（${p.digitalGov.toFixed(1)}分），跨境电商单一窗口与部门系统对接仍存在接口不统一问题`);
+    problems.push(`数字政府综合能力有待提升（${p.digitalGov.toFixed(1)} 分），跨境电商单一窗口与部门系统对接仍存在接口不统一问题`);
     solutions.push("推进跨境电商单一窗口与各监管部门系统深度对接，规范数据接口标准，完善企业合规数据的自动校验与预警机制");
   }
 
-  // 宽带用户分析
-  if (p.broadband < 40) {
-    problems.push(`固定宽带渗透率偏低（${p.broadband.toFixed(1)}每百户），口岸与跨境电商园区网络稳定性不足，影响数据回传与智能审单能力`);
-    solutions.push("推进口岸及综试区园区宽带升级改造，增加链路冗余，建设5G+全光网络，保障跨境电商高频次、小批量申报的数据传输质量");
-  }
-
-  // 移动电话分析
-  if (p.mobile < 110) {
-    problems.push(`移动通信覆盖密度偏低（${p.mobile.toFixed(1)}每百人），跨境电商企业移动端办理业务便捷性不足，影响全天候通关效率`);
-    solutions.push("加快推进5G网络建设与城乡均衡覆盖，优化移动政务服务跨境电商专区，简化移动端操作流程，适配跨境电商全天候、快响应办事需求");
-  }
-
-  // 透明度分析
+  // 透明度分析（浙大网络透明度指数）
   if (p.transparency < 72) {
-    problems.push(`政府网络透明度有待提升（${p.transparency.toFixed(1)}分），监管规则可预期性不足，影响企业合规成本与跨境电商营商环境`);
+    problems.push(`政府网络透明度偏低（${p.transparency.toFixed(1)} 分），监管规则可预期性不足，影响企业合规成本与跨境电商营商环境`);
     solutions.push("推进跨境电商监管规则主动公开，完善意见征集与公众参与机制，建立监管政策变动提前告知制度，降低企业合规的信息不对称成本");
+  } else if (p.transparency < 78) {
+    problems.push(`政府网络透明度有提升空间（${p.transparency.toFixed(1)} 分），部分监管信息发布及时性和可获取性仍待完善`);
+    solutions.push("优化政府网站政策发布机制，提高跨境电商相关政策解读的时效性与用户友好度，建立常态化意见反馈渠道");
   }
 
-  // 网民规模分析
-  if (p.internetUsers < 70) {
-    problems.push(`互联网普及率相对偏低（网民规模指数${p.internetUsers.toFixed(1)}），数字红利向农村及偏远地区传导不足，制约跨境电商生态的全域延伸`);
-    solutions.push("加快推进数字包容工程，提升农村及偏远地区网络覆盖率，加强跨境电商从业人员数字素养培训，推动综试区覆盖范围向农村电商延伸");
+  // 综合得分分析（0-1 scale）
+  if (p.total < 0.3) {
+    problems.push(`综合治理能力处于待提升阶段（综合得分 ${(p.total * 100).toFixed(1)}），三项核心指标均有较大提升空间，跨境电商治理体系建设相对滞后`);
+    solutions.push("制定省级跨境电商数字治理专项提升计划，针对数字政府能力、数据开放度与政务透明度三个维度分别设立短期与中期改进目标");
   }
 
   // 确保至少有3条问题和解决方案
   if (problems.length === 0) {
-    problems.push("整体数字治理能力较强，但部分指标仍有提升空间，需持续优化以保持竞争优势");
-    solutions.push("巩固现有治理优势，深化数字政府与跨境电商监管的场景化对接，探索将本地经验向其他省份复制推广");
+    problems.push("整体数字治理能力较强，但三项核心指标仍有差异化提升空间，需持续优化各维度短板");
+    solutions.push("巩固现有治理优势，深化数字政府能力与跨境电商监管的场景化对接，探索将本地经验向其他省份复制推广");
   }
   if (problems.length < 2) {
     problems.push("综试区政策落地执行一致性有待加强，不同城市间数字治理水平存在内部差距");
@@ -270,38 +269,41 @@ function getProvinceProblems(p) {
   return { problems, solutions };
 }
 
+// 三项省级指标数据（来源：第四章4.2节表格，熵值法合成综合得分）
+// 权重：数字政府 0.345，开放度 0.306，透明度 0.349
+// 综合得分基于极差标准化后加权求和，浙江=1.000为基准
 const chinaRawData = [
-  { name: "北京", adcode: 110000, internetUsers: 76.26, broadband: 36.09, mobile: 155.49, digitalGov: 81.64, openness: 40.77, transparency: 83.14, total: 78.90 },
-  { name: "天津", adcode: 120000, internetUsers: 84.82, broadband: 49.37, mobile: 138.08, digitalGov: 70.14, openness: 42.57, transparency: 72.53, total: 76.25 },
-  { name: "河北", adcode: 130000, internetUsers: 85.44, broadband: 43.10, mobile: 119.00, digitalGov: 65.56, openness: 17.70, transparency: 76.16, total: 67.83 },
-  { name: "山西", adcode: 140000, internetUsers: 75.42, broadband: 46.58, mobile: 122.30, digitalGov: 64.29, openness: 8.48, transparency: 77.93, total: 65.83 },
-  { name: "内蒙古", adcode: 150000, internetUsers: 83.58, broadband: 39.72, mobile: 126.73, digitalGov: 66.13, openness: 6.24, transparency: 79.40, total: 66.97 },
-  { name: "辽宁", adcode: 210000, internetUsers: 90.76, broadband: 40.67, mobile: 125.28, digitalGov: 65.22, openness: 26.88, transparency: 80.48, total: 71.55 },
-  { name: "吉林", adcode: 220000, internetUsers: 82.48, broadband: 36.72, mobile: 129.91, digitalGov: 59.34, openness: 7.11, transparency: 78.80, total: 65.73 },
-  { name: "黑龙江", adcode: 230000, internetUsers: 91.78, broadband: 39.98, mobile: 129.57, digitalGov: 63.90, openness: 7.95, transparency: 76.12, total: 68.22 },
-  { name: "上海", adcode: 310000, internetUsers: 88.47, broadband: 48.61, mobile: 185.24, digitalGov: 80.18, openness: 63.57, transparency: 82.95, total: 91.50 },
-  { name: "江苏", adcode: 320000, internetUsers: 80.30, broadband: 55.77, mobile: 127.37, digitalGov: 75.11, openness: 26.66, transparency: 81.42, total: 74.44 },
-  { name: "浙江", adcode: 330000, internetUsers: 76.14, broadband: 53.85, mobile: 138.69, digitalGov: 83.03, openness: 78.47, transparency: 85.11, total: 85.88 },
-  { name: "安徽", adcode: 340000, internetUsers: 72.79, broadband: 48.13, mobile: 107.22, digitalGov: 75.06, openness: 21.40, transparency: 75.69, total: 66.72 },
-  { name: "福建", adcode: 350000, internetUsers: 73.72, broadband: 53.93, mobile: 117.11, digitalGov: 70.92, openness: 48.15, transparency: 80.78, total: 74.10 },
-  { name: "江西", adcode: 360000, internetUsers: 73.01, broadband: 46.45, mobile: 106.95, digitalGov: 64.12, openness: 29.60, transparency: 76.24, total: 66.06 },
-  { name: "山东", adcode: 370000, internetUsers: 77.42, broadband: 45.62, mobile: 119.51, digitalGov: 71.63, openness: 72.97, transparency: 84.39, total: 78.59 },
-  { name: "河南", adcode: 410000, internetUsers: 74.54, broadband: 43.54, mobile: 111.14, digitalGov: 67.94, openness: 4.87, transparency: 75.01, total: 62.84 },
-  { name: "湖北", adcode: 420000, internetUsers: 77.55, broadband: 42.75, mobile: 107.34, digitalGov: 66.86, openness: 7.82, transparency: 77.76, total: 63.35 },
-  { name: "湖南", adcode: 430000, internetUsers: 76.16, broadband: 41.97, mobile: 117.45, digitalGov: 70.31, openness: 11.46, transparency: 81.70, total: 66.51 },
-  { name: "广东", adcode: 440000, internetUsers: 82.56, broadband: 37.51, mobile: 132.57, digitalGov: 75.91, openness: 44.37, transparency: 82.36, total: 75.88 },
-  { name: "广西", adcode: 450000, internetUsers: 76.41, broadband: 46.41, mobile: 121.74, digitalGov: 66.44, openness: 43.56, transparency: 75.91, total: 71.75 },
-  { name: "海南", adcode: 460000, internetUsers: 78.48, broadband: 54.80, mobile: 113.77, digitalGov: 68.56, openness: 35.20, transparency: 82.27, total: 72.18 },
-  { name: "重庆", adcode: 500000, internetUsers: 74.02, broadband: 48.66, mobile: 134.92, digitalGov: 69.24, openness: 35.12, transparency: 80.54, total: 73.75 },
-  { name: "四川", adcode: 510000, internetUsers: 71.93, broadband: 45.05, mobile: 115.62, digitalGov: 72.93, openness: 45.99, transparency: 82.33, total: 72.31 },
-  { name: "贵州", adcode: 520000, internetUsers: 63.13, broadband: 40.66, mobile: 116.88, digitalGov: 69.05, openness: 59.96, transparency: 81.52, total: 71.87 },
-  { name: "云南", adcode: 530000, internetUsers: 70.14, broadband: 38.20, mobile: 111.18, digitalGov: 63.69, openness: 2.84, transparency: 78.59, total: 60.77 },
-  { name: "西藏", adcode: 540000, internetUsers: 73.24, broadband: 39.32, mobile: 92.41, digitalGov: 55.54, openness: 3.12, transparency: 67.92, total: 55.26 },
-  { name: "陕西", adcode: 610000, internetUsers: 79.31, broadband: 48.60, mobile: 124.35, digitalGov: 66.86, openness: 19.42, transparency: 70.46, total: 68.17 },
-  { name: "甘肃", adcode: 620000, internetUsers: 73.23, broadband: 48.58, mobile: 117.87, digitalGov: 64.31, openness: 5.94, transparency: 76.55, total: 64.41 },
-  { name: "青海", adcode: 630000, internetUsers: 71.79, broadband: 49.09, mobile: 124.19, digitalGov: 59.27, openness: 2.20, transparency: 71.45, total: 63.00 },
-  { name: "宁夏", adcode: 640000, internetUsers: 71.60, broadband: 51.17, mobile: 124.86, digitalGov: 57.50, openness: 4.44, transparency: 75.71, total: 64.21 },
-  { name: "新疆", adcode: 650000, internetUsers: 74.34, broadband: 49.12, mobile: 113.42, digitalGov: 57.05, openness: 6.89, transparency: 77.02, total: 62.97 },
+  { name: "北京",   adcode: 110000, digitalGov: 81.64, openness: 40.77, transparency: 83.14, total: 0.791 },
+  { name: "天津",   adcode: 120000, digitalGov: 70.14, openness: 42.57, transparency: 72.53, total: 0.439 },
+  { name: "河北",   adcode: 130000, digitalGov: 65.56, openness: 17.70, transparency: 76.16, total: 0.355 },
+  { name: "山西",   adcode: 140000, digitalGov: 64.29, openness:  8.48, transparency: 77.93, total: 0.338 },
+  { name: "内蒙古", adcode: 150000, digitalGov: 66.13, openness:  6.24, transparency: 79.40, total: 0.382 },
+  { name: "辽宁",   adcode: 210000, digitalGov: 65.22, openness: 26.88, transparency: 80.48, total: 0.476 },
+  { name: "吉林",   adcode: 220000, digitalGov: 59.34, openness:  7.11, transparency: 78.80, total: 0.288 },
+  { name: "黑龙江", adcode: 230000, digitalGov: 63.90, openness:  7.95, transparency: 76.12, total: 0.295 },
+  { name: "上海",   adcode: 310000, digitalGov: 80.18, openness: 63.57, transparency: 82.95, total: 0.861 },
+  { name: "江苏",   adcode: 320000, digitalGov: 75.11, openness: 26.66, transparency: 81.42, total: 0.618 },
+  { name: "浙江",   adcode: 330000, digitalGov: 83.03, openness: 78.47, transparency: 85.11, total: 1.000 },
+  { name: "安徽",   adcode: 340000, digitalGov: 75.06, openness: 21.40, transparency: 75.69, total: 0.480 },
+  { name: "福建",   adcode: 350000, digitalGov: 70.92, openness: 48.15, transparency: 80.78, total: 0.639 },
+  { name: "江西",   adcode: 360000, digitalGov: 64.12, openness: 29.60, transparency: 76.24, total: 0.387 },
+  { name: "山东",   adcode: 370000, digitalGov: 71.63, openness: 72.97, transparency: 84.39, total: 0.820 },
+  { name: "河南",   adcode: 410000, digitalGov: 67.94, openness:  4.87, transparency: 75.01, total: 0.310 },
+  { name: "湖北",   adcode: 420000, digitalGov: 66.86, openness:  7.82, transparency: 77.76, total: 0.364 },
+  { name: "湖南",   adcode: 430000, digitalGov: 70.31, openness: 11.46, transparency: 81.70, total: 0.502 },
+  { name: "广东",   adcode: 440000, digitalGov: 75.91, openness: 44.37, transparency: 82.36, total: 0.718 },
+  { name: "广西",   adcode: 450000, digitalGov: 66.44, openness: 43.56, transparency: 75.91, total: 0.465 },
+  { name: "海南",   adcode: 460000, digitalGov: 68.56, openness: 35.20, transparency: 82.27, total: 0.587 },
+  { name: "重庆",   adcode: 500000, digitalGov: 69.24, openness: 35.12, transparency: 80.54, total: 0.560 },
+  { name: "四川",   adcode: 510000, digitalGov: 72.93, openness: 45.99, transparency: 82.33, total: 0.687 },
+  { name: "贵州",   adcode: 520000, digitalGov: 69.05, openness: 59.96, transparency: 81.52, total: 0.677 },
+  { name: "云南",   adcode: 530000, digitalGov: 63.69, openness:  2.84, transparency: 78.59, total: 0.322 },
+  { name: "西藏",   adcode: 540000, digitalGov: 55.54, openness:  3.12, transparency: 67.92, total: 0.004 },
+  { name: "陕西",   adcode: 610000, digitalGov: 66.86, openness: 19.42, transparency: 70.46, total: 0.263 },
+  { name: "甘肃",   adcode: 620000, digitalGov: 64.31, openness:  5.94, transparency: 76.55, total: 0.300 },
+  { name: "青海",   adcode: 630000, digitalGov: 59.27, openness:  2.20, transparency: 71.45, total: 0.119 },
+  { name: "宁夏",   adcode: 640000, digitalGov: 57.50, openness:  4.44, transparency: 75.71, total: 0.192 },
+  { name: "新疆",   adcode: 650000, digitalGov: 57.05, openness:  6.89, transparency: 77.02, total: 0.223 },
 ];
 
 // 补充问题与解决方案
@@ -318,12 +320,13 @@ chinaData.forEach(p => { provinceCodeMap[p.adcode] = p; });
 const provinceNameMap = {};
 chinaData.forEach(p => { provinceNameMap[p.name] = p.adcode; });
 
-// 风险等级配色（省域）
+// 风险等级配色（省域）—— 基于熵值法极差标准化综合得分（0–1 scale）
+// ≥0.7 优秀 | ≥0.5 良好 | ≥0.3 中等 | <0.3 待提升
 function getProvinceLevel(score) {
-  if (score >= 80) return { level: "优秀", color: "#27ae60" };
-  if (score >= 70) return { level: "良好", color: "#3498db" };
-  if (score >= 62) return { level: "中等", color: "#f39c12" };
-  return { level: "待提升", color: "#e74c3c" };
+  if (score >= 0.7) return { level: "优秀", color: "#0d6e5c" };
+  if (score >= 0.5) return { level: "良好", color: "#2563a8" };
+  if (score >= 0.3) return { level: "中等", color: "#c77a1a" };
+  return { level: "待提升", color: "#c0392b" };
 }
 
 
