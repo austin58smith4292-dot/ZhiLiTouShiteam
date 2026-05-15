@@ -647,22 +647,60 @@
         showSection('map');
       });
 
-    const labelAliases = { InnerMongolia: '内蒙古', NeiMongol: '内蒙古', Hongkong: '香港', HongKong: '香港', Macau: '澳门', Macao: '澳门', Taiwan: '台湾', Xizang: '西藏', Tibet: '西藏', Xinjiang: '新疆', Ningxia: '宁夏', Guangxi: '广西', Qinghai: '青海', Qianghai: '青海', Shaanxi: '陕西', Shanxi: '山西', Chongqing: '重庆', Heilongjiang: '黑龙江', Jiangxi: '江西', Hubei: '湖北', Hunan: '湖南', Guangdong: '广东', Beijing: '北京', Shanghai: '上海', Tianjin: '天津', Hebei: '河北', Liaoning: '辽宁', Jilin: '吉林', Shandong: '山东', Henan: '河南', Jiangsu: '江苏', Zhejiang: '浙江', Fujian: '福建', Hainan: '海南', Sichuan: '四川', Guizhou: '贵州', Yunnan: '云南', Gansu: '甘肃', Anhui: '安徽', Jiangsu: '江苏', Shandong: '山东' };
+    // 英文名 → 简称
+    const labelAliases = { InnerMongolia: '内蒙古', NeiMongol: '内蒙古', Hongkong: '香港', HongKong: '香港', Macau: '澳门', Macao: '澳门', Taiwan: '台湾', Xizang: '西藏', Tibet: '西藏', Xinjiang: '新疆', Ningxia: '宁夏', Guangxi: '广西', Qinghai: '青海', Qianghai: '青海', Shaanxi: '陕西', Shanxi: '山西', Chongqing: '重庆', Heilongjiang: '黑龙江', Jiangxi: '江西', Hubei: '湖北', Hunan: '湖南', Guangdong: '广东', Beijing: '北京', Shanghai: '上海', Tianjin: '天津', Hebei: '河北', Liaoning: '辽宁', Jilin: '吉林', Shandong: '山东', Henan: '河南', Jiangsu: '江苏', Zhejiang: '浙江', Fujian: '福建', Hainan: '海南', Sichuan: '四川', Guizhou: '贵州', Yunnan: '云南', Gansu: '甘肃', Anhui: '安徽' };
+    // 简称 → 全称
+    const fullNameMap = {
+      '北京': '北京市', '天津': '天津市', '上海': '上海市', '重庆': '重庆市',
+      '河北': '河北省', '山西': '山西省', '辽宁': '辽宁省', '吉林': '吉林省',
+      '黑龙江': '黑龙江省', '江苏': '江苏省', '浙江': '浙江省', '安徽': '安徽省',
+      '福建': '福建省', '江西': '江西省', '山东': '山东省', '河南': '河南省',
+      '湖北': '湖北省', '湖南': '湖南省', '广东': '广东省', '海南': '海南省',
+      '四川': '四川省', '贵州': '贵州省', '云南': '云南省', '陕西': '陕西省',
+      '甘肃': '甘肃省', '青海': '青海省', '台湾': '台湾省',
+      '内蒙古': '内蒙古自治区', '广西': '广西壮族自治区', '西藏': '西藏自治区',
+      '宁夏': '宁夏回族自治区', '新疆': '新疆维吾尔自治区',
+      '香港': '香港特别行政区', '澳门': '澳门特别行政区'
+    };
+    // 将全称拆成适合地图显示的多行
+    function splitProvinceLabel(fullName) {
+      if (fullName.endsWith('特别行政区')) {
+        return [fullName.slice(0, fullName.length - 5), '特别行政区'];
+      }
+      if (fullName.endsWith('自治区')) {
+        return [fullName.slice(0, fullName.length - 3), '自治区'];
+      }
+      if (fullName.length <= 4) return [fullName];
+      return [fullName.slice(0, 4), fullName.slice(4)];
+    }
+
     g.selectAll('text').data(geo.features).enter().append('text')
       .attr('transform', d => `translate(${path.centroid(d)})`)
-      .attr('text-anchor', 'middle').attr('font-size', '8.5px')
-      .attr('fill', 'rgba(28,44,48,.7)').style('pointer-events', 'none')
-      .text(d => {
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'rgba(28,44,48,.75)').style('pointer-events', 'none')
+      .each(function(d) {
         const p = getProvinceByNameOrCode(getFeatureName(d), getFeatureCode(d));
-        let rawName;
+        let shortName;
         if (p) {
-          rawName = p.name;
+          shortName = p.name;
         } else {
           const feat = getFeatureName(d);
-          rawName = labelAliases[feat] || labelAliases[feat.replace(/\s+/g, '')] || feat;
+          shortName = labelAliases[feat] || labelAliases[feat.replace(/\s+/g, '')] || feat;
         }
-        const name = rawName.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '');
-        return name.length <= 3 ? name : name.slice(0, 3);
+        const fullName = fullNameMap[shortName] || shortName;
+        const lines = splitProvinceLabel(fullName);
+        // 根据行数与最长行字数动态调整字号
+        const maxLen = Math.max(...lines.map(l => l.length));
+        const fontSize = maxLen >= 5 ? 7 : 8;
+        const lineH = fontSize + 2;
+        const startDy = -((lines.length - 1) * lineH) / 2;
+        d3.select(this).attr('font-size', `${fontSize}px`);
+        lines.forEach((line, i) => {
+          d3.select(this).append('tspan')
+            .attr('x', 0)
+            .attr('dy', i === 0 ? `${startDy}px` : `${lineH}px`)
+            .text(line);
+        });
       });
 
     drawSouthChinaSeaInset(g, path, geo, w, h);
