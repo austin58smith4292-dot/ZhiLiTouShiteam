@@ -647,13 +647,21 @@
         showSection('map');
       });
 
+    const labelAliases = { InnerMongolia: '内蒙古', NeiMongol: '内蒙古', Hongkong: '香港', HongKong: '香港', Macau: '澳门', Macao: '澳门', Taiwan: '台湾', Xizang: '西藏', Tibet: '西藏', Xinjiang: '新疆', Ningxia: '宁夏', Guangxi: '广西', Qinghai: '青海', Qianghai: '青海', Shaanxi: '陕西', Shanxi: '山西', Chongqing: '重庆', Heilongjiang: '黑龙江', Jiangxi: '江西', Hubei: '湖北', Hunan: '湖南', Guangdong: '广东', Beijing: '北京', Shanghai: '上海', Tianjin: '天津', Hebei: '河北', Liaoning: '辽宁', Jilin: '吉林', Shandong: '山东', Henan: '河南', Jiangsu: '江苏', Zhejiang: '浙江', Fujian: '福建', Hainan: '海南', Sichuan: '四川', Guizhou: '贵州', Yunnan: '云南', Gansu: '甘肃', Anhui: '安徽', Jiangsu: '江苏', Shandong: '山东' };
     g.selectAll('text').data(geo.features).enter().append('text')
       .attr('transform', d => `translate(${path.centroid(d)})`)
       .attr('text-anchor', 'middle').attr('font-size', '8.5px')
       .attr('fill', 'rgba(28,44,48,.7)').style('pointer-events', 'none')
       .text(d => {
         const p = getProvinceByNameOrCode(getFeatureName(d), getFeatureCode(d));
-        const name = (p ? p.name : getFeatureName(d)).replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '');
+        let rawName;
+        if (p) {
+          rawName = p.name;
+        } else {
+          const feat = getFeatureName(d);
+          rawName = labelAliases[feat] || labelAliases[feat.replace(/\s+/g, '')] || feat;
+        }
+        const name = rawName.replace(/省|市|自治区|壮族|回族|维吾尔|特别行政区/g, '');
         return name.length <= 3 ? name : name.slice(0, 3);
       });
 
