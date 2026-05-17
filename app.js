@@ -674,24 +674,47 @@
       return [fullName.slice(0, 4), fullName.slice(4)];
     }
 
+    // 针对形状特殊或面积极小的省份手动微调标签位置 [dx, dy]（单位：SVG像素）
+    // 香港、澳门面积极小紧邻，各自向不同方向偏移以避免重叠
+    const labelOffsets = {
+      '内蒙古': [ 30, -10],   // 弧形狭长，质心偏西，整体右移上移
+      '甘肃':   [-14,   0],   // 狭长走廊形，质心偏右
+      '云南':   [  0,  10],   // 质心略偏高
+      '西藏':   [  0,  12],   // 质心略偏高
+      '新疆':   [  0,  14],   // 质心略偏高
+      '黑龙江': [ 10,   4],   // 质心偏左
+      '台湾':   [ 16,   0],   // 岛屿，向右偏移更居中
+      '香港':   [ 28,  -4],   // 极小，向右上偏移
+      '澳门':   [-10,  18],   // 极小，向左下偏移，与香港分开
+      '海南':   [  0,  10],   // 岛屿，质心略偏高
+    };
+
+    // 获取短名（用于查 offset / fullNameMap）
+    function getShortName(d) {
+      const p = getProvinceByNameOrCode(getFeatureName(d), getFeatureCode(d));
+      if (p) return p.name;
+      const feat = getFeatureName(d);
+      return labelAliases[feat] || labelAliases[feat.replace(/\s+/g, '')] || feat;
+    }
+
     g.selectAll('text').data(geo.features).enter().append('text')
-      .attr('transform', d => `translate(${path.centroid(d)})`)
+      .attr('transform', d => {
+        const c = path.centroid(d);
+        if (!isFinite(c[0]) || !isFinite(c[1])) return null;
+        const off = labelOffsets[getShortName(d)] || [0, 0];
+        return `translate(${c[0] + off[0]},${c[1] + off[1]})`;
+      })
       .attr('text-anchor', 'middle')
       .attr('fill', 'rgba(28,44,48,.75)').style('pointer-events', 'none')
       .each(function(d) {
-        const p = getProvinceByNameOrCode(getFeatureName(d), getFeatureCode(d));
-        let shortName;
-        if (p) {
-          shortName = p.name;
-        } else {
-          const feat = getFeatureName(d);
-          shortName = labelAliases[feat] || labelAliases[feat.replace(/\s+/g, '')] || feat;
-        }
+        const shortName = getShortName(d);
         const fullName = fullNameMap[shortName] || shortName;
-        const lines = splitProvinceLabel(fullName);
-        // 根据行数与最长行字数动态调整字号
+        // 香港、澳门在国家尺度下面积极小，只显示两字简称避免文字堆叠
+        const isTiny = ['香港', '澳门'].includes(shortName);
+        const displayName = isTiny ? shortName : fullName;
+        const lines = isTiny ? [displayName] : splitProvinceLabel(displayName);
         const maxLen = Math.max(...lines.map(l => l.length));
-        const fontSize = maxLen >= 5 ? 7 : 8;
+        const fontSize = isTiny ? 6.5 : (maxLen >= 5 ? 7 : 8);
         const lineH = fontSize + 2;
         const startDy = -((lines.length - 1) * lineH) / 2;
         d3.select(this).attr('font-size', `${fontSize}px`);
